@@ -24,6 +24,24 @@ class ResultTest {
     }
 
     @Test
+    void containsErr() {
+        var v = Result.Ok(2);
+        Assertions.assertFalse(v.containsErr("Some error message"));
+
+        var w = Result.Err("Some error message");
+        Assertions.assertFalse(w.containsErr(null));
+
+        var x = Result.Err(null);
+        Assertions.assertFalse(x.containsErr("Some error message"));
+
+        var y = Result.Err("Some error message");
+        Assertions.assertTrue(y.containsErr("Some error message"));
+
+        var z = Result.Err("Some other error message");
+        Assertions.assertFalse(z.containsErr("Some error message"));
+    }
+
+    @Test
     void err() {
         var x = Result.Ok(2);
         Assertions.assertTrue(x.err().isEmpty());
@@ -37,6 +55,7 @@ class ResultTest {
         var x = Result.Err("emergency failure");
         try {
             x.expect("Testing expect");
+            Assertions.fail();
         } catch (RuntimeException e) {
             Assertions.assertEquals("Testing expect: emergency failure", e.getMessage());
         }
@@ -47,6 +66,7 @@ class ResultTest {
         var z = Result.Err(null);
         try {
             z.expect("Testing expect");
+            Assertions.fail();
         } catch (RuntimeException e) {
             Assertions.assertEquals("Testing expect: ", e.getMessage());
         }
@@ -90,6 +110,7 @@ class ResultTest {
         var y = Result.Err("emergency failure");
         try {
             y.unwrap();
+            Assertions.fail();
         } catch (RuntimeException e) {
             Assertions.assertEquals("emergency failure", e.getMessage());
         }
@@ -97,6 +118,7 @@ class ResultTest {
         var z = Result.Err(null);
         try {
             z.unwrap();
+            Assertions.fail();
         } catch (RuntimeException e) {
             Assertions.assertNull(e.getMessage());
         }

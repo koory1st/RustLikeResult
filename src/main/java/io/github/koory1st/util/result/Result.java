@@ -83,6 +83,35 @@ public class Result<T, E> {
     }
 
     /**
+     * @param value the given value
+     * @return true if the result is an Err value containing the given value.
+     */
+    public boolean containsErr(String value) {
+        if (okFlg) {
+            return false;
+        }
+
+        if (value == null) {
+            return false;
+        }
+
+        if (err().isEmpty()) {
+            return false;
+        }
+
+        return Objects.equals(value, err().get());
+    }
+
+    /**
+     * Converts from Result<T, E> to Option<E>.
+     *
+     * @return Optional<E>
+     */
+    public Optional<E> err() {
+        return Optional.ofNullable(err);
+    }
+
+    /**
      * @param msg passed message
      * @return the contained Ok value
      * @throws RuntimeException if the value is an Err, with a message including the passed message, and the content of the Err.
@@ -95,15 +124,6 @@ public class Result<T, E> {
         String errString = err().isEmpty() ? EMPTY_STRING : err().get().toString();
 
         throw new RuntimeException(String.format(EXPECT_FMT, msg, errString));
-    }
-
-    /**
-     * Converts from Result<T, E> to Option<E>.
-     *
-     * @return Optional<E>
-     */
-    public Optional<E> err() {
-        return Optional.ofNullable(err);
     }
 
     /**
