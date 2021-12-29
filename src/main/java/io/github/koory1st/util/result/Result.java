@@ -9,46 +9,17 @@ import java.util.Optional;
  * @param <T> success (Ok)
  * @param <E> failure (Err)
  */
-public class Result<T, E> {
+public abstract class Result<T, E> {
     public static final String EMPTY_STRING = "";
     public static final String EXPECT_FMT = "%s: %s";
     private final E err;
     private final T ok;
     private final boolean okFlg;
 
-    private Result(T ok, E err, boolean okFlg) {
+    protected Result(T ok, E err, boolean okFlg) {
         this.ok = ok;
         this.err = err;
         this.okFlg = okFlg;
-    }
-
-    /**
-     * Construct an Err Result
-     *
-     * @param err Err content
-     * @return an Err Result
-     */
-    public static <Void, E> Result<Void, E> Err(E err) {
-        return new Result<>(null, err, false);
-    }
-
-    /**
-     * Construct an Ok Result
-     *
-     * @param ok Ok content
-     * @return an Ok Result
-     */
-    public static <T, Void> Result<T, Void> Ok(T ok) {
-        return new Result<>(ok, null, true);
-    }
-
-    /**
-     * Construct an Ok Result without Ok content
-     *
-     * @return an Ok Result
-     */
-    public static <Void> Result<Void, Void> Ok() {
-        return new Result<>(null, null, true);
     }
 
     /**
@@ -122,6 +93,21 @@ public class Result<T, E> {
         }
 
         String errString = err().isEmpty() ? EMPTY_STRING : err().get().toString();
+
+        throw new RuntimeException(String.format(EXPECT_FMT, msg, errString));
+    }
+
+    /**
+     * @param msg
+     * @return the contained Err value.
+     * @throws RuntimeException if the value is an Ok, with a panic message including the passed message, and the content of the Ok.
+     */
+    public E expectErr(String msg) throws RuntimeException {
+        if (!okFlg) {
+            return err().orElse(null);
+        }
+
+        String errString = ok().isEmpty() ? EMPTY_STRING : ok().get().toString();
 
         throw new RuntimeException(String.format(EXPECT_FMT, msg, errString));
     }
