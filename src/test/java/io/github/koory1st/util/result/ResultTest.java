@@ -56,7 +56,7 @@ class ResultTest {
         try {
             x.expect("Testing expect");
             Assertions.fail();
-        } catch (RuntimeException e) {
+        } catch (ResultPanicException e) {
             Assertions.assertEquals("Testing expect: emergency failure", e.getMessage());
         }
 
@@ -67,7 +67,7 @@ class ResultTest {
         try {
             z.expect("Testing expect");
             Assertions.fail();
-        } catch (RuntimeException e) {
+        } catch (ResultPanicException e) {
             Assertions.assertEquals("Testing expect: ", e.getMessage());
         }
     }
@@ -78,7 +78,7 @@ class ResultTest {
         try {
             x.expectErr("Testing expectErr");
             Assertions.fail();
-        } catch (RuntimeException e) {
+        } catch (ResultPanicException e) {
             Assertions.assertEquals("Testing expectErr: 2", e.getMessage());
         }
 
@@ -89,7 +89,7 @@ class ResultTest {
         try {
             z.expectErr("Testing expectErr");
             Assertions.fail();
-        } catch (RuntimeException e) {
+        } catch (ResultPanicException e) {
             Assertions.assertEquals("Testing expectErr: ", e.getMessage());
         }
     }
@@ -133,7 +133,7 @@ class ResultTest {
         try {
             y.unwrap();
             Assertions.fail();
-        } catch (RuntimeException e) {
+        } catch (ResultPanicException e) {
             Assertions.assertEquals("emergency failure", e.getMessage());
         }
 
@@ -141,7 +141,7 @@ class ResultTest {
         try {
             z.unwrap();
             Assertions.fail();
-        } catch (RuntimeException e) {
+        } catch (ResultPanicException e) {
             Assertions.assertNull(e.getMessage());
         }
     }

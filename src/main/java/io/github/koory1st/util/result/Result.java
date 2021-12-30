@@ -85,31 +85,31 @@ public abstract class Result<T, E> {
     /**
      * @param msg passed message
      * @return the contained Ok value
-     * @throws RuntimeException if the value is an Err, with a message including the passed message, and the content of the Err.
+     * @throws ResultPanicException if the value is an Err, with a message including the passed message, and the content of the Err.
      */
-    public T expect(String msg) throws RuntimeException {
+    public T expect(String msg) throws ResultPanicException {
         if (okFlg) {
             return ok().orElse(null);
         }
 
         String errString = err().isEmpty() ? EMPTY_STRING : err().get().toString();
 
-        throw new RuntimeException(String.format(EXPECT_FMT, msg, errString));
+        throw new ResultPanicException(String.format(EXPECT_FMT, msg, errString));
     }
 
     /**
      * @param msg
      * @return the contained Err value.
-     * @throws RuntimeException if the value is an Ok, with a panic message including the passed message, and the content of the Ok.
+     * @throws ResultPanicException if the value is an Ok, with a panic message including the passed message, and the content of the Ok.
      */
-    public E expectErr(String msg) throws RuntimeException {
+    public E expectErr(String msg) throws ResultPanicException {
         if (!okFlg) {
             return err().orElse(null);
         }
 
         String errString = ok().isEmpty() ? EMPTY_STRING : ok().get().toString();
 
-        throw new RuntimeException(String.format(EXPECT_FMT, msg, errString));
+        throw new ResultPanicException(String.format(EXPECT_FMT, msg, errString));
     }
 
     /**
@@ -128,17 +128,17 @@ public abstract class Result<T, E> {
 
     /**
      * @return the contained Ok value, consuming the self value.
-     * @throws RuntimeException if the value is an Err, with a message provided by the Err’s value.
+     * @throws ResultPanicException if the value is an Err, with a message provided by the Err’s value.
      */
-    public T unwrap() throws RuntimeException {
+    public T unwrap() throws ResultPanicException {
         if (okFlg) {
             return ok().orElse(null);
         }
 
         err().ifPresent(e -> {
-            throw new RuntimeException(e.toString());
+            throw new ResultPanicException(e.toString());
         });
 
-        throw new RuntimeException();
+        throw new ResultPanicException();
     }
 }
