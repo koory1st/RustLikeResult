@@ -4,8 +4,4 @@ public class ResultPanicException extends RuntimeException {
     public ResultPanicException(String msg) {
         super(msg);
     }
-
-    public ResultPanicException() {
-        super();
-    }
 }

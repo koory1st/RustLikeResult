@@ -31,9 +31,6 @@ class ResultTest {
         var w = Err.build("Some error message");
         Assertions.assertFalse(w.containsErr(null));
 
-        var x = Err.build(null);
-        Assertions.assertFalse(x.containsErr("Some error message"));
-
         var y = Err.build("Some error message");
         Assertions.assertTrue(y.containsErr("Some error message"));
 
@@ -63,7 +60,7 @@ class ResultTest {
         var y = Ok.build(2);
         Assertions.assertEquals(2, y.expect("normal"));
 
-        var z = Err.build(null);
+        var z = Err.build("");
         try {
             z.expect("Testing expect");
             Assertions.fail();
@@ -137,12 +134,21 @@ class ResultTest {
             Assertions.assertEquals("emergency failure", e.getMessage());
         }
 
-        var z = Err.build(null);
+        var z = Err.build("");
         try {
             z.unwrap();
             Assertions.fail();
         } catch (ResultPanicException e) {
-            Assertions.assertNull(e.getMessage());
+            Assertions.assertEquals("", e.getMessage());
+        }
+
+        try {
+            //noinspection ConstantConditions
+            var w = Err.build(null);
+            w.unwrap();
+            Assertions.fail();
+        } catch (ResultPanicException e) {
+            Assertions.assertEquals("Can't set a null to an Err's Content.", e.getMessage());
         }
     }
 

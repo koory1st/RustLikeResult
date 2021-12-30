@@ -1,5 +1,8 @@
 package io.github.koory1st.util.result;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -11,6 +14,7 @@ import java.util.Optional;
  */
 public abstract class Result<T, E> {
     public static final String EMPTY_STRING = "";
+    public static final String ERR_S_CONTENT_IS_EMPTY = "Err's content is empty.";
     public static final String EXPECT_FMT = "%s: %s";
     private final E err;
     private final T ok;
@@ -26,13 +30,8 @@ public abstract class Result<T, E> {
      * @param value given value
      * @return true if the result is an Ok value containing the given value.
      */
-    public boolean contains(T value) {
+    public boolean contains(@NotNull T value) {
         if (!okFlg) {
-            return false;
-        }
-
-        // if value is null, return false
-        if (value == null) {
             return false;
         }
 
@@ -49,6 +48,7 @@ public abstract class Result<T, E> {
      *
      * @return Option<T>
      */
+    @NotNull
     public Optional<T> ok() {
         return Optional.ofNullable(ok);
     }
@@ -57,19 +57,17 @@ public abstract class Result<T, E> {
      * @param value the given value
      * @return true if the result is an Err value containing the given value.
      */
-    public boolean containsErr(String value) {
+    public boolean containsErr(@NotNull String value) {
         if (okFlg) {
             return false;
         }
 
+        //noinspection ConstantConditions
         if (value == null) {
             return false;
         }
 
-        if (err().isEmpty()) {
-            return false;
-        }
-
+        //noinspection OptionalGetWithoutIsPresent
         return Objects.equals(value, err().get());
     }
 
@@ -78,8 +76,19 @@ public abstract class Result<T, E> {
      *
      * @return Optional<E>
      */
+    @NotNull
     public Optional<E> err() {
+        if (isErr()) {
+            return Optional.of(err);
+        }
         return Optional.ofNullable(err);
+    }
+
+    /**
+     * @return true if the result is Err.
+     */
+    public boolean isErr() {
+        return !okFlg;
     }
 
     /**
@@ -87,7 +96,8 @@ public abstract class Result<T, E> {
      * @return the contained Ok value
      * @throws ResultPanicException if the value is an Err, with a message including the passed message, and the content of the Err.
      */
-    public T expect(String msg) throws ResultPanicException {
+    @Nullable
+    public T expect(@NotNull String msg) throws ResultPanicException {
         if (okFlg) {
             return ok().orElse(null);
         }
@@ -98,25 +108,20 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * @param msg
+     * @param msg passed message
      * @return the contained Err value.
      * @throws ResultPanicException if the value is an Ok, with a panic message including the passed message, and the content of the Ok.
      */
-    public E expectErr(String msg) throws ResultPanicException {
+    @NotNull
+    public E expectErr(@NotNull String msg) throws ResultPanicException {
         if (!okFlg) {
-            return err().orElse(null);
+            //noinspection OptionalGetWithoutIsPresent
+            return err().get();
         }
 
         String errString = ok().isEmpty() ? EMPTY_STRING : ok().get().toString();
 
         throw new ResultPanicException(String.format(EXPECT_FMT, msg, errString));
-    }
-
-    /**
-     * @return true if the result is Err.
-     */
-    public boolean isErr() {
-        return !okFlg;
     }
 
     /**
@@ -130,15 +135,13 @@ public abstract class Result<T, E> {
      * @return the contained Ok value, consuming the self value.
      * @throws ResultPanicException if the value is an Err, with a message provided by the Err’s value.
      */
+    @Nullable
     public T unwrap() throws ResultPanicException {
         if (okFlg) {
             return ok().orElse(null);
         }
 
-        err().ifPresent(e -> {
-            throw new ResultPanicException(e.toString());
-        });
-
-        throw new ResultPanicException();
+        //noinspection OptionalGetWithoutIsPresent
+        throw new ResultPanicException(err().get().toString());
     }
 }
