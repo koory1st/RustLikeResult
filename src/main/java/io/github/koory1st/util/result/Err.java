@@ -8,7 +8,7 @@ public class Err<T, E> extends Result<T, E> {
     }
 
     @NotNull
-    public static <T, E> Err<T, E> build(@NotNull E err) {
+    public static <T, E> Err<T, E> of(@NotNull E err) {
         //noinspection ConstantConditions
         if (err == null) {
             throw new ResultPanicException("Can't set a null to an Err's Content.");

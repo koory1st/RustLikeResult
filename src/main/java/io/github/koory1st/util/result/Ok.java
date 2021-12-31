@@ -7,11 +7,11 @@ public class Ok<T> extends Result<T, Void> {
         super(ok, null, true);
     }
 
-    public static <T> Ok<T> build(@NotNull T ok) {
+    public static <T> Ok<T> of(@NotNull T ok) {
         return new Ok<>(ok);
     }
 
-    public static <T> Ok<T> build() {
+    public static <T> Ok<T> of() {
         return new Ok<>(null);
     }
 }
