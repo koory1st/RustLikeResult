@@ -180,7 +180,7 @@ public abstract class Result<T, E> {
      * This function can be used to compose the results of two functions.
      *
      * @param mapFunction mapFunction
-     * @return Result<U, E>
+     * @return mapped Result<U, E>
      */
     public <U> Result<U, E> map(Function<T, U> mapFunction) {
         if (this.isErr()) {
@@ -201,11 +201,31 @@ public abstract class Result<T, E> {
      *
      * @param defaultValue default value
      * @param mapFunction  mapFunction
-     * @return U
+     * @return mapped U
      */
     public <U> U mapOr(U defaultValue, Function<T, U> mapFunction) {
         if (this.isErr()) {
             return defaultValue;
+        }
+
+        if (this.ok().isEmpty()) {
+            throw new ResultPanicException(CAN_T_MAP_A_EMPTY_OK);
+        }
+
+        return mapFunction.apply(this.ok().get());
+    }
+
+    /**
+     * Returns the provided default (if Err), or applies a function to the contained value (if Ok),
+     *
+     * @param defaultFunction defaultFunction
+     * @param mapFunction     mapFunction
+     * @return mapped U
+     */
+    public <U> U mapOrElse(Function<E, U> defaultFunction, Function<T, U> mapFunction) {
+        if (this.isErr()) {
+            //noinspection OptionalGetWithoutIsPresent
+            return defaultFunction.apply(this.err().get());
         }
 
         if (this.ok().isEmpty()) {
