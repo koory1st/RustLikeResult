@@ -197,6 +197,25 @@ public abstract class Result<T, E> {
     }
 
     /**
+     * Returns the provided default (if Err), or applies a function to the contained value (if Ok)
+     *
+     * @param defaultValue default value
+     * @param mapFunction  mapFunction
+     * @return U
+     */
+    public <U> U mapOr(U defaultValue, Function<T, U> mapFunction) {
+        if (this.isErr()) {
+            return defaultValue;
+        }
+
+        if (this.ok().isEmpty()) {
+            throw new ResultPanicException(CAN_T_MAP_A_EMPTY_OK);
+        }
+
+        return mapFunction.apply(this.ok().get());
+    }
+
+    /**
      * @return the contained Ok value, consuming the self value.
      * @throws ResultPanicException if the value is an Err, with a message provided by the Err’s value.
      */

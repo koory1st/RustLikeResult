@@ -167,6 +167,24 @@ class ResultTest {
     }
 
     @Test
+    void mapOr() {
+        var x = Ok.of("Foo");
+        Assertions.assertEquals(3, x.mapOr(42, String::length));
+
+        Result<String, String> y = Err.of("Bar");
+        Assertions.assertEquals(42, y.mapOr(42, String::length));
+
+        Ok<Integer> z = Ok.of();
+
+        try {
+            z.mapOr(43, value -> value * 2);
+            Assertions.fail();
+        } catch (Exception e) {
+            Assertions.assertEquals("Can't map a Empty Ok.", e.getMessage());
+        }
+    }
+
+    @Test
     void ok() {
         var x = Ok.of(2);
         Assertions.assertEquals(2, x.ok().orElseThrow());
