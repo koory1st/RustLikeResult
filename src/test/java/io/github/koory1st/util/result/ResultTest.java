@@ -147,6 +147,26 @@ class ResultTest {
     }
 
     @Test
+    void map() {
+        var x = Ok.of(2);
+        Assertions.assertEquals(Ok.of(4), x.map(value -> value * 2));
+        Assertions.assertNotEquals(Ok.of(5), x.map(value -> value * 2));
+        Assertions.assertEquals(Ok.of(8), Ok.of(4).map(value -> value * 2));
+        Result<Integer, String> y = Err.of("an error");
+        Assertions.assertEquals(Err.of("an error"), y.map(value -> value * 2));
+        Assertions.assertNotEquals(Ok.of(8), y.map(value -> value * 2));
+
+        Ok<Integer> z = Ok.of();
+
+        try {
+            z.map(value -> value * 2);
+            Assertions.fail();
+        } catch (Exception e) {
+            Assertions.assertEquals("Can't map a Empty Ok.", e.getMessage());
+        }
+    }
+
+    @Test
     void ok() {
         var x = Ok.of(2);
         Assertions.assertEquals(2, x.ok().orElseThrow());

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Result is a type that represents either success (Ok) or failure (Err).
@@ -13,6 +14,7 @@ import java.util.Optional;
  * @param <E> failure (Err)
  */
 public abstract class Result<T, E> {
+    public static final String CAN_T_MAP_A_EMPTY_OK = "Can't map a Empty Ok.";
     public static final String EMPTY_STRING = "";
     public static final String EXPECT_FMT = "%s: %s";
     private final E err;
@@ -170,6 +172,26 @@ public abstract class Result<T, E> {
             return (Result) ok;
         }
         return this;
+    }
+
+    /**
+     * Maps a Result<T, E> to Result<U, E>
+     * by applying a function to a contained Ok value, leaving an Err value untouched.
+     * This function can be used to compose the results of two functions.
+     *
+     * @param mapFunction mapFunction
+     * @return Result<U, E>
+     */
+    public <U> Result<U, E> map(Function<T, U> mapFunction) {
+        if (this.isErr()) {
+            return (Result<U, E>) this;
+        }
+
+        if (this.ok().isEmpty()) {
+            throw new ResultPanicException(CAN_T_MAP_A_EMPTY_OK);
+        }
+
+        return (Result<U, E>) Ok.of(mapFunction.apply(this.ok().get()));
     }
 
     /**
