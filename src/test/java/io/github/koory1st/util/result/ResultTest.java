@@ -39,6 +39,20 @@ class ResultTest {
     }
 
     @Test
+    void equals() {
+        Assertions.assertEquals(Ok.of(1), Ok.of(1));
+        Assertions.assertEquals(Ok.of(), Ok.of());
+        Assertions.assertNotEquals(Ok.of(1), Ok.of(2));
+        Assertions.assertNotEquals(Ok.of(1), Ok.of("1"));
+        Assertions.assertNotEquals(Ok.of(1), Ok.of());
+        Assertions.assertNotEquals(Ok.of(1), Err.of("1"));
+        Assertions.assertNotEquals(Ok.of(), Err.of("1"));
+        Assertions.assertEquals(Err.of("1"), Err.of("1"));
+        Assertions.assertNotEquals(Ok.of(1), new Object());
+
+    }
+
+    @Test
     void err() {
         var x = Ok.of(2);
         Assertions.assertTrue(x.err().isEmpty());
@@ -89,6 +103,29 @@ class ResultTest {
         } catch (ResultPanicException e) {
             Assertions.assertEquals("Testing expectErr: ", e.getMessage());
         }
+    }
+
+    @Test
+    void flatten() {
+        var v = Ok.of("hello");
+        Assertions.assertEquals(Ok.of("hello"), v.flatten());
+        Assertions.assertNotEquals(Ok.of("hello1"), v.flatten());
+
+        var w = Ok.of();
+        Assertions.assertEquals(Ok.of(), w.flatten());
+        Assertions.assertNotEquals(Ok.of("hello1"), w.flatten());
+
+        var x = Ok.of(Ok.of("hello"));
+        Assertions.assertEquals(Ok.of("hello"), x.flatten());
+        Assertions.assertNotEquals(Ok.of("hello1"), x.flatten());
+
+        var y = Ok.of(Err.of(6));
+        Assertions.assertEquals(Err.of(6), y.flatten());
+        Assertions.assertNotEquals(Err.of(7), y.flatten());
+
+        var z = Err.of(6);
+        Assertions.assertEquals(Err.of(6), z.flatten());
+        Assertions.assertNotEquals(Err.of(7), y.flatten());
     }
 
     @Test

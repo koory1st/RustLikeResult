@@ -14,7 +14,6 @@ import java.util.Optional;
  */
 public abstract class Result<T, E> {
     public static final String EMPTY_STRING = "";
-    public static final String ERR_S_CONTENT_IS_EMPTY = "Err's content is empty.";
     public static final String EXPECT_FMT = "%s: %s";
     private final E err;
     private final T ok;
@@ -91,6 +90,32 @@ public abstract class Result<T, E> {
         return !okFlg;
     }
 
+    @Override
+    public boolean equals(Object obj2Compare) {
+        if (!(obj2Compare instanceof Result)) {
+            return false;
+        }
+
+        //noinspection rawtypes
+        Result obj2CompareResult = (Result) obj2Compare;
+        if (this.isOk() != obj2CompareResult.isOk()) {
+            return false;
+        }
+
+        if (this.isOk()) {
+            return this.ok().equals(obj2CompareResult.ok());
+        }
+
+        return this.err().equals(obj2CompareResult.err());
+    }
+
+    /**
+     * @return true if the result is Ok.
+     */
+    public boolean isOk() {
+        return okFlg;
+    }
+
     /**
      * @param msg passed message
      * @return the contained Ok value
@@ -125,10 +150,26 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * @return true if the result is Ok.
+     * Converts from Result<Result<T, E>, E> to Result<T, E>
+     *
+     * @return Result<T, E>
      */
-    public boolean isOk() {
-        return okFlg;
+    public Result<T, E> flatten() {
+        if (!okFlg) {
+            return Err.of(err);
+        }
+
+        Optional<T> okOptional = ok();
+        if (okOptional.isEmpty()) {
+            return this;
+        }
+
+        T ok = okOptional.get();
+        if (ok instanceof Result) {
+            //noinspection unchecked
+            return (Result) ok;
+        }
+        return this;
     }
 
     /**
