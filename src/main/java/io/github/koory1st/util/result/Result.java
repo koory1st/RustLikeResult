@@ -16,7 +16,11 @@ import java.util.function.Function;
 public abstract class Result<T, E> {
     public static final String CAN_T_MAP_A_EMPTY_OK = "Can't map a Empty Ok.";
     public static final String EMPTY_STRING = "";
+    public static final String ERR = "Err";
     public static final String EXPECT_FMT = "%s: %s";
+    public static final String OK = "Ok";
+    public static final String TO_STRING_FMT = "%s(%s)";
+    public static final String TO_STRING_QUOTE_FMT = "%s(\"%s\")";
     private final E err;
     private final T ok;
     private final boolean okFlg;
@@ -132,6 +136,23 @@ public abstract class Result<T, E> {
         return this.err().equals(obj2CompareResult.err());
     }
 
+    @Override
+    public String toString() {
+        if (this.isOk()) {
+            T content = ok().orElse(null);
+            if (content instanceof String) {
+                return String.format(TO_STRING_QUOTE_FMT, OK, content);
+            }
+            return String.format(TO_STRING_FMT, OK, content);
+        }
+
+        E content = err().orElse(null);
+        if (content instanceof String) {
+            return String.format(TO_STRING_QUOTE_FMT, ERR, content);
+        }
+        return String.format(TO_STRING_FMT, ERR, content);
+    }
+
     /**
      * @param msg passed message
      * @return the contained Ok value
@@ -207,7 +228,7 @@ public abstract class Result<T, E> {
         }
 
         //noinspection unchecked
-        return (Result<U, E>) Ok.of(mapFunction.apply(this.ok().get()));
+        return Ok.of(mapFunction.apply(this.ok().get()));
     }
 
     /**

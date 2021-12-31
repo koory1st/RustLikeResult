@@ -58,20 +58,6 @@ class ResultTest {
     }
 
     @Test
-    void equals() {
-        Assertions.assertEquals(Ok.of(1), Ok.of(1));
-        Assertions.assertEquals(Ok.of(), Ok.of());
-        Assertions.assertNotEquals(Ok.of(1), Ok.of(2));
-        Assertions.assertNotEquals(Ok.of(1), Ok.of("1"));
-        Assertions.assertNotEquals(Ok.of(1), Ok.of());
-        Assertions.assertNotEquals(Ok.of(1), Err.of("1"));
-        Assertions.assertNotEquals(Ok.of(), Err.of("1"));
-        Assertions.assertEquals(Err.of("1"), Err.of("1"));
-        Assertions.assertNotEquals(Ok.of(1), new Object());
-
-    }
-
-    @Test
     void err() {
         var x = Ok.of(2);
         Assertions.assertTrue(x.err().isEmpty());
@@ -230,6 +216,28 @@ class ResultTest {
 
         var z = Ok.of();
         Assertions.assertTrue(z.isOk());
+    }
+
+    @Test
+    void testEquals() {
+        Assertions.assertEquals(Ok.of(1), Ok.of(1));
+        Assertions.assertEquals(Ok.of(), Ok.of());
+        Assertions.assertNotEquals(Ok.of(1), Ok.of(2));
+        Assertions.assertNotEquals(Ok.of(1), Ok.of("1"));
+        Assertions.assertNotEquals(Ok.of(1), Ok.of());
+        Assertions.assertNotEquals(Ok.of(1), Err.of("1"));
+        Assertions.assertNotEquals(Ok.of(), Err.of("1"));
+        Assertions.assertEquals(Err.of("1"), Err.of("1"));
+        Assertions.assertNotEquals(Ok.of(1), new Object());
+
+    }
+
+    @Test
+    void testToString() {
+        Assertions.assertEquals("Ok(1)", Ok.of(1).toString());
+        Assertions.assertEquals("Ok(\"1\")", Ok.of("1").toString());
+        Assertions.assertEquals("Err(1)", Err.of(1).toString());
+        Assertions.assertEquals("Err(\"1\")", Err.of("1").toString());
     }
 
     @Test
