@@ -28,6 +28,27 @@ public abstract class Result<T, E> {
     }
 
     /**
+     * Returns `res` if the result is [`Ok`], otherwise returns the [`Err`] value of `self`.
+     *
+     * @param res res
+     * @return Result
+     */
+    public <U> Result<?, E> and(Result<U, E> res) {
+        if (this.isOk()) {
+            return res;
+        }
+
+        return this;
+    }
+
+    /**
+     * @return true if the result is Ok.
+     */
+    public boolean isOk() {
+        return okFlg;
+    }
+
+    /**
      * @param value given value
      * @return true if the result is an Ok value containing the given value.
      */
@@ -109,13 +130,6 @@ public abstract class Result<T, E> {
         }
 
         return this.err().equals(obj2CompareResult.err());
-    }
-
-    /**
-     * @return true if the result is Ok.
-     */
-    public boolean isOk() {
-        return okFlg;
     }
 
     /**

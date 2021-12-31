@@ -6,6 +6,25 @@ import org.junit.jupiter.api.Test;
 class ResultTest {
 
     @Test
+    void and() {
+        Result<Integer, String> x1 = Ok.of(2);
+        Result<String, String> y1 = Err.of("late error");
+        Assertions.assertEquals(y1, x1.and(y1));
+
+        Result<Integer, String> x2 = Err.of("early error");
+        Result<String, String> y2 = Ok.of("foo");
+        Assertions.assertEquals(x2, x2.and(y2));
+
+        Result<Integer, String> x3 = Err.of("not a 2");
+        Result<String, String> y3 = Err.of("late error");
+        Assertions.assertEquals(x3, x3.and(y3));
+
+        Result<Integer, String> x4 = Ok.of(2);
+        Result<String, String> y4 = Ok.of("different result type");
+        Assertions.assertEquals(y4, x4.and(y4));
+    }
+
+    @Test
     void contains() {
         var v = Ok.of(2);
         Assertions.assertFalse(v.contains(null));
@@ -156,7 +175,7 @@ class ResultTest {
         Assertions.assertEquals(Err.of("an error"), y.map(value -> value * 2));
         Assertions.assertNotEquals(Ok.of(8), y.map(value -> value * 2));
 
-        Ok<Integer> z = Ok.of();
+        Ok<Integer, String> z = Ok.of();
 
         try {
             z.map(value -> value * 2);
@@ -174,7 +193,7 @@ class ResultTest {
         Result<String, String> y = Err.of("Bar");
         Assertions.assertEquals(42, y.mapOr(42, String::length));
 
-        Ok<Integer> z = Ok.of();
+        Ok<Integer, String> z = Ok.of();
         try {
             z.mapOr(43, value -> value * 2);
             Assertions.fail();
@@ -192,7 +211,7 @@ class ResultTest {
         Result<String, String> y = Err.of("Bar");
         Assertions.assertEquals(42, y.mapOrElse(e -> k * 2, String::length));
 
-        Ok<Integer> z = Ok.of();
+        Ok<Integer, String> z = Ok.of();
         try {
             z.mapOrElse(e -> k * 2, value -> value * 2);
             Assertions.fail();
