@@ -310,7 +310,7 @@ class ResultTest {
             y.unwrap();
             Assertions.fail();
         } catch (ResultPanicException e) {
-            Assertions.assertEquals("emergency failure", e.getMessage());
+            Assertions.assertEquals("called `Result.unwrap()` on an `Err` value: emergency failure", e.getMessage());
         }
 
         var z = Err.of("");
@@ -318,7 +318,7 @@ class ResultTest {
             z.unwrap();
             Assertions.fail();
         } catch (ResultPanicException e) {
-            Assertions.assertEquals("", e.getMessage());
+            Assertions.assertEquals("called `Result.unwrap()` on an `Err` value: ", e.getMessage());
         }
 
         try {
@@ -329,6 +329,20 @@ class ResultTest {
         } catch (ResultPanicException e) {
             Assertions.assertEquals("Can't set a null to an Err's Content.", e.getMessage());
         }
+    }
+
+    @Test
+    void unwrapErr() {
+        var x = Ok.of(2);
+        try {
+            x.unwrapErr();
+            Assertions.fail();
+        } catch (ResultPanicException e) {
+            Assertions.assertEquals("called `Result.unwrapErr()` on an `Ok` value: 2", e.getMessage());
+        }
+
+        var y = Err.of("emergency failure");
+        Assertions.assertEquals("emergency failure", y.unwrapErr());
     }
 
 }

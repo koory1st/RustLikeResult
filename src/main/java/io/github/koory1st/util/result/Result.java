@@ -21,6 +21,8 @@ public abstract class Result<T, E> {
     public static final String OK = "Ok";
     public static final String TO_STRING_FMT = "%s(%s)";
     public static final String TO_STRING_QUOTE_FMT = "%s(\"%s\")";
+    public static final String UNWRAP_ERR_PANIC_STR = "called `Result.unwrapErr()` on an `Ok` value: %s";
+    public static final String UNWRAP_PANIC_STR = "called `Result.unwrap()` on an `Err` value: %s";
     private final E err;
     private final T ok;
     private final boolean okFlg;
@@ -123,19 +125,6 @@ public abstract class Result<T, E> {
         return Objects.equals(value, err);
     }
 
-    /**
-     * Converts from Result<T, E> to Option<E>.
-     *
-     * @return Optional<E>
-     */
-    @NotNull
-    public Optional<E> err() {
-        if (isErr()) {
-            return Optional.of(err);
-        }
-        return Optional.ofNullable(err);
-    }
-
     @Override
     public boolean equals(Object obj2Compare) {
         if (!(obj2Compare instanceof Result)) {
@@ -153,6 +142,35 @@ public abstract class Result<T, E> {
         }
 
         return this.err().equals(obj2CompareResult.err());
+    }
+
+    /**
+     * Converts from Result<T, E> to Option<E>.
+     *
+     * @return Optional<E>
+     */
+    @NotNull
+    public Optional<E> err() {
+        if (isErr()) {
+            return Optional.of(err);
+        }
+        return Optional.ofNullable(err);
+    }
+
+    @Override
+    @NotNull
+    public String toString() {
+        if (this.isOk()) {
+            if (ok instanceof String) {
+                return String.format(TO_STRING_QUOTE_FMT, OK, ok);
+            }
+            return String.format(TO_STRING_FMT, OK, ok);
+        }
+
+        if (err instanceof String) {
+            return String.format(TO_STRING_QUOTE_FMT, ERR, err);
+        }
+        return String.format(TO_STRING_FMT, ERR, err);
     }
 
     /**
@@ -210,21 +228,6 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained [`Err`] value
-     *
-     * @param mapFunction mapFunction
-     * @return Result<T, F>
-     */
-    @NotNull
-    public <F> Result<T, F> mapErr(@NotNull Function<E, F> mapFunction) {
-        if (this.isOk()) {
-            return Ok.of(this.ok);
-        }
-
-        return Err.of(mapFunction.apply(err));
-    }
-
-    /**
      * Maps a Result<T, E> to Result<U, E>
      * by applying a function to a contained Ok value, leaving an Err value untouched.
      * This function can be used to compose the results of two functions.
@@ -243,6 +246,21 @@ public abstract class Result<T, E> {
         }
 
         return Ok.of(mapFunction.apply(this.ok));
+    }
+
+    /**
+     * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained [`Err`] value
+     *
+     * @param mapFunction mapFunction
+     * @return Result<T, F>
+     */
+    @NotNull
+    public <F> Result<T, F> mapErr(@NotNull Function<E, F> mapFunction) {
+        if (this.isOk()) {
+            return Ok.of(this.ok);
+        }
+
+        return Err.of(mapFunction.apply(err));
     }
 
     /**
@@ -285,22 +303,6 @@ public abstract class Result<T, E> {
         return mapFunction.apply(ok);
     }
 
-    @Override
-    @NotNull
-    public String toString() {
-        if (this.isOk()) {
-            if (ok instanceof String) {
-                return String.format(TO_STRING_QUOTE_FMT, OK, ok);
-            }
-            return String.format(TO_STRING_FMT, OK, ok);
-        }
-
-        if (err instanceof String) {
-            return String.format(TO_STRING_QUOTE_FMT, ERR, err);
-        }
-        return String.format(TO_STRING_FMT, ERR, err);
-    }
-
     /**
      * Returns `res` if the result is [`Err`], otherwise returns the [`Ok`] value of `self`.
      *
@@ -338,6 +340,19 @@ public abstract class Result<T, E> {
             return ok;
         }
 
-        throw new ResultPanicException(err.toString());
+        throw new ResultPanicException(String.format(UNWRAP_PANIC_STR, err));
+    }
+
+    /**
+     * @return the contained [`Err`] value
+     * @throws ResultPanicException if the value is an [`Ok`], with a custom panic message provided by the [`Ok`]'s value.
+     */
+    @NotNull
+    public E unwrapErr() throws ResultPanicException {
+        if (isErr()) {
+            return err;
+        }
+
+        throw new ResultPanicException(String.format(UNWRAP_ERR_PANIC_STR, ok));
     }
 }
