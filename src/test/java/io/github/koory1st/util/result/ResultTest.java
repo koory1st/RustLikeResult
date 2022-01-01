@@ -345,4 +345,14 @@ class ResultTest {
         Assertions.assertEquals("emergency failure", y.unwrapErr());
     }
 
+    @Test
+    void unwrapOr() {
+        var defaultValue = 2;
+        var x = Ok.of(9);
+        Assertions.assertEquals(9, x.unwrapOr(defaultValue));
+
+        var y = Err.of("error");
+        Assertions.assertEquals(defaultValue, y.unwrapOr(defaultValue));
+    }
+
 }

@@ -355,4 +355,16 @@ public abstract class Result<T, E> {
 
         throw new ResultPanicException(String.format(UNWRAP_ERR_PANIC_STR, ok));
     }
+
+    /**
+     * @param defaultValue default
+     * @return the contained [`Ok`] value or a provided default.
+     */
+    @Nullable
+    public T unwrapOr(@Nullable T defaultValue) {
+        if (isErr()) {
+            return defaultValue;
+        }
+        return ok;
+    }
 }
