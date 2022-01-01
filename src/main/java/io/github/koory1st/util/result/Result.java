@@ -14,7 +14,7 @@ import java.util.function.Function;
  * @param <E> failure (Err)
  */
 public abstract class Result<T, E> {
-    public static final String CAN_T_MAP_A_EMPTY_OK = "Can't map a Empty Ok.";
+    public static final String CANT_APPLY_FUNCTION_A_EMPTY_OK = "Can't applying a function to a Empty Ok.";
     public static final String EMPTY_STRING = "";
     public static final String ERR = "Err";
     public static final String EXPECT_FMT = "%s: %s";
@@ -54,6 +54,55 @@ public abstract class Result<T, E> {
     }
 
     /**
+     * Calls `op` if the result is [`Ok`], otherwise returns the [`Err`] value of `self`.
+     *
+     * @param op op
+     * @return the [`Err`] value of `self`.
+     */
+    public <U> Result<U, E> andThen(Function<T, Result<U, E>> op) {
+        if (!this.isOk()) {
+            //noinspection OptionalGetWithoutIsPresent
+            return Err.of(this.err().get());
+        }
+
+        if (this.ok().isEmpty()) {
+            throw new ResultPanicException(CANT_APPLY_FUNCTION_A_EMPTY_OK);
+        }
+
+        return op.apply(this.ok().get());
+    }
+
+    /**
+     * Converts from Result<T, E> to Option<E>.
+     *
+     * @return Optional<E>
+     */
+    @NotNull
+    public Optional<E> err() {
+        if (isErr()) {
+            return Optional.of(err);
+        }
+        return Optional.ofNullable(err);
+    }
+
+    /**
+     * Converts from Result<T, E> to Optional<T>.
+     *
+     * @return Option<T>
+     */
+    @NotNull
+    public Optional<T> ok() {
+        return Optional.ofNullable(ok);
+    }
+
+    /**
+     * @return true if the result is Err.
+     */
+    public boolean isErr() {
+        return !okFlg;
+    }
+
+    /**
      * @param value given value
      * @return true if the result is an Ok value containing the given value.
      */
@@ -68,16 +117,6 @@ public abstract class Result<T, E> {
         }
 
         return Objects.equals(ok().get(), value);
-    }
-
-    /**
-     * Converts from Result<T, E> to Optional<T>.
-     *
-     * @return Option<T>
-     */
-    @NotNull
-    public Optional<T> ok() {
-        return Optional.ofNullable(ok);
     }
 
     /**
@@ -96,26 +135,6 @@ public abstract class Result<T, E> {
 
         //noinspection OptionalGetWithoutIsPresent
         return Objects.equals(value, err().get());
-    }
-
-    /**
-     * Converts from Result<T, E> to Option<E>.
-     *
-     * @return Optional<E>
-     */
-    @NotNull
-    public Optional<E> err() {
-        if (isErr()) {
-            return Optional.of(err);
-        }
-        return Optional.ofNullable(err);
-    }
-
-    /**
-     * @return true if the result is Err.
-     */
-    public boolean isErr() {
-        return !okFlg;
     }
 
     @Override
@@ -228,7 +247,7 @@ public abstract class Result<T, E> {
         }
 
         if (this.ok().isEmpty()) {
-            throw new ResultPanicException(CAN_T_MAP_A_EMPTY_OK);
+            throw new ResultPanicException(CANT_APPLY_FUNCTION_A_EMPTY_OK);
         }
 
         //noinspection unchecked
@@ -249,7 +268,7 @@ public abstract class Result<T, E> {
         }
 
         if (this.ok().isEmpty()) {
-            throw new ResultPanicException(CAN_T_MAP_A_EMPTY_OK);
+            throw new ResultPanicException(CANT_APPLY_FUNCTION_A_EMPTY_OK);
         }
 
         return mapFunction.apply(this.ok().get());
@@ -270,7 +289,7 @@ public abstract class Result<T, E> {
         }
 
         if (this.ok().isEmpty()) {
-            throw new ResultPanicException(CAN_T_MAP_A_EMPTY_OK);
+            throw new ResultPanicException(CANT_APPLY_FUNCTION_A_EMPTY_OK);
         }
 
         return mapFunction.apply(this.ok().get());
@@ -289,6 +308,4 @@ public abstract class Result<T, E> {
         //noinspection OptionalGetWithoutIsPresent
         throw new ResultPanicException(err().get().toString());
     }
-
-
 }

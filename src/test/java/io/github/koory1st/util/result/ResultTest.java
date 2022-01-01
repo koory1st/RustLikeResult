@@ -3,6 +3,8 @@ package io.github.koory1st.util.result;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.Function;
+
 class ResultTest {
 
     @Test
@@ -22,6 +24,33 @@ class ResultTest {
         Result<Integer, String> x4 = Ok.of(2);
         Result<String, String> y4 = Ok.of("different result type");
         Assertions.assertEquals(y4, x4.and(y4));
+    }
+
+    @Test
+    void andThen() {
+        Function<Integer, Result<Integer, Integer>> sq = x -> Ok.of(x * x);
+        Function<Integer, Result<Integer, Integer>> err = x -> Err.of(x);
+
+        Result<Integer, Integer> w = Ok.of(2);
+        Assertions.assertEquals(Ok.of(16), w.andThen(sq).andThen(sq));
+
+        Result<Integer, Integer> x = Ok.of(2);
+        Assertions.assertEquals(Err.of(4), x.andThen(sq).andThen(err));
+
+        Result<Integer, Integer> y = Ok.of(2);
+        Assertions.assertEquals(Err.of(2), y.andThen(err).andThen(sq));
+
+        Result<Integer, Integer> z = Err.of(3);
+        Assertions.assertEquals(Err.of(3), z.andThen(sq).andThen(err));
+
+        Result<Integer, Integer> t = Ok.of();
+
+        try {
+            Result<Integer, Integer> re = t.andThen(sq);
+            Assertions.fail();
+        } catch (Exception e) {
+            Assertions.assertEquals("Can't applying a function to a Empty Ok.", e.getMessage());
+        }
     }
 
     @Test
@@ -167,7 +196,7 @@ class ResultTest {
             z.map(value -> value * 2);
             Assertions.fail();
         } catch (Exception e) {
-            Assertions.assertEquals("Can't map a Empty Ok.", e.getMessage());
+            Assertions.assertEquals("Can't applying a function to a Empty Ok.", e.getMessage());
         }
     }
 
@@ -184,7 +213,7 @@ class ResultTest {
             z.mapOr(43, value -> value * 2);
             Assertions.fail();
         } catch (Exception e) {
-            Assertions.assertEquals("Can't map a Empty Ok.", e.getMessage());
+            Assertions.assertEquals("Can't applying a function to a Empty Ok.", e.getMessage());
         }
     }
 
@@ -202,7 +231,7 @@ class ResultTest {
             z.mapOrElse(e -> k * 2, value -> value * 2);
             Assertions.fail();
         } catch (Exception e) {
-            Assertions.assertEquals("Can't map a Empty Ok.", e.getMessage());
+            Assertions.assertEquals("Can't applying a function to a Empty Ok.", e.getMessage());
         }
     }
 
