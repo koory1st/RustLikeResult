@@ -243,16 +243,14 @@ public abstract class Result<T, E> {
     @NotNull
     public <U> Result<U, E> map(Function<T, U> mapFunction) {
         if (this.isErr()) {
-            //noinspection unchecked
-            return (Result<U, E>) this;
+            return Err.of(this.err);
         }
 
         if (this.ok().isEmpty()) {
             throw new ResultPanicException(CANT_APPLY_FUNCTION_A_EMPTY_OK);
         }
-
-        //noinspection unchecked
-        return Ok.of(mapFunction.apply(this.ok().get()));
+        
+        return Ok.of(mapFunction.apply(this.ok));
     }
 
     /**
@@ -264,8 +262,7 @@ public abstract class Result<T, E> {
     @NotNull
     public <F> Result<T, F> mapErr(@NotNull Function<E, F> mapFunction) {
         if (this.isOk()) {
-            //noinspection unchecked
-            return (Result<T, F>) this;
+            return Ok.of(this.ok);
         }
 
         //noinspection OptionalGetWithoutIsPresent
