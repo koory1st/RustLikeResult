@@ -38,7 +38,7 @@ public abstract class Result<T, E> {
      * @return Result
      */
     @NotNull
-    public <U> Result<?, E> and(Result<U, E> res) {
+    public <U> Result<?, E> and(@NotNull Result<U, E> res) {
         if (this.isOk()) {
             return res;
         }
@@ -59,7 +59,8 @@ public abstract class Result<T, E> {
      * @param op op
      * @return the [`Err`] value of `self`.
      */
-    public <U> Result<U, E> andThen(Function<T, Result<U, E>> op) {
+    @NotNull
+    public <U> Result<U, E> andThen(@NotNull Function<T, Result<U, E>> op) {
         if (!this.isOk()) {
             //noinspection OptionalGetWithoutIsPresent
             return Err.of(this.err().get());
@@ -255,6 +256,23 @@ public abstract class Result<T, E> {
     }
 
     /**
+     * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained [`Err`] value
+     *
+     * @param mapFunction mapFunction
+     * @return Result<T, F>
+     */
+    @NotNull
+    public <F> Result<T, F> mapErr(@NotNull Function<E, F> mapFunction) {
+        if (this.isOk()) {
+            //noinspection unchecked
+            return (Result<T, F>) this;
+        }
+
+        //noinspection OptionalGetWithoutIsPresent
+        return Err.of(mapFunction.apply(this.err().get()));
+    }
+
+    /**
      * Returns the provided default (if Err), or applies a function to the contained value (if Ok)
      *
      * @param defaultValue default value
@@ -262,7 +280,7 @@ public abstract class Result<T, E> {
      * @return mapped U
      */
     @NotNull
-    public <U> U mapOr(U defaultValue, Function<T, U> mapFunction) {
+    public <U> U mapOr(@NotNull U defaultValue, @NotNull Function<T, U> mapFunction) {
         if (this.isErr()) {
             return defaultValue;
         }
@@ -282,7 +300,7 @@ public abstract class Result<T, E> {
      * @return mapped U
      */
     @NotNull
-    public <U> U mapOrElse(Function<E, U> defaultFunction, Function<T, U> mapFunction) {
+    public <U> U mapOrElse(@NotNull Function<E, U> defaultFunction, @NotNull Function<T, U> mapFunction) {
         if (this.isErr()) {
             //noinspection OptionalGetWithoutIsPresent
             return defaultFunction.apply(this.err().get());

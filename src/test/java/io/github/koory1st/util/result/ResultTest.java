@@ -201,6 +201,16 @@ class ResultTest {
     }
 
     @Test
+    void mapErr() {
+        Function<Integer, String> stringify = x -> String.format("error code: %s", x);
+        Result<Integer, Integer> x = Ok.of(2);
+        Assertions.assertEquals(x.mapErr(stringify), Ok.of(2));
+
+        Result<Integer, Integer> y = Err.of(13);
+        Assertions.assertEquals(y.mapErr(stringify), Err.of("error code: 13"));
+    }
+
+    @Test
     void mapOr() {
         var x = Ok.of("Foo");
         Assertions.assertEquals(3, x.mapOr(42, String::length));
