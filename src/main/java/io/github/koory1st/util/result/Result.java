@@ -37,6 +37,7 @@ public abstract class Result<T, E> {
      * @param res res
      * @return Result
      */
+    @NotNull
     public <U> Result<?, E> and(Result<U, E> res) {
         if (this.isOk()) {
             return res;
@@ -137,6 +138,7 @@ public abstract class Result<T, E> {
     }
 
     @Override
+    @NotNull
     public String toString() {
         if (this.isOk()) {
             T content = ok().orElse(null);
@@ -191,6 +193,7 @@ public abstract class Result<T, E> {
      *
      * @return Result<T, E>
      */
+    @NotNull
     public Result<T, E> flatten() {
         if (!okFlg) {
             return Err.of(err);
@@ -217,6 +220,7 @@ public abstract class Result<T, E> {
      * @param mapFunction mapFunction
      * @return mapped Result<U, E>
      */
+    @NotNull
     public <U> Result<U, E> map(Function<T, U> mapFunction) {
         if (this.isErr()) {
             //noinspection unchecked
@@ -238,6 +242,7 @@ public abstract class Result<T, E> {
      * @param mapFunction  mapFunction
      * @return mapped U
      */
+    @NotNull
     public <U> U mapOr(U defaultValue, Function<T, U> mapFunction) {
         if (this.isErr()) {
             return defaultValue;
@@ -257,6 +262,7 @@ public abstract class Result<T, E> {
      * @param mapFunction     mapFunction
      * @return mapped U
      */
+    @NotNull
     public <U> U mapOrElse(Function<E, U> defaultFunction, Function<T, U> mapFunction) {
         if (this.isErr()) {
             //noinspection OptionalGetWithoutIsPresent
@@ -283,4 +289,6 @@ public abstract class Result<T, E> {
         //noinspection OptionalGetWithoutIsPresent
         throw new ResultPanicException(err().get().toString());
     }
+
+
 }
