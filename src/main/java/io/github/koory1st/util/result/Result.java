@@ -367,4 +367,16 @@ public abstract class Result<T, E> {
         }
         return ok;
     }
+
+    /**
+     * @param op a closure
+     * @return the contained [`Ok`] value or computes it from a closure.
+     */
+    @Nullable
+    public T unwrapOrElse(@NotNull Function<E, T> op) {
+        if (isOk()) {
+            return ok;
+        }
+        return op.apply(err);
+    }
 }

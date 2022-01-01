@@ -355,4 +355,14 @@ class ResultTest {
         Assertions.assertEquals(defaultValue, y.unwrapOr(defaultValue));
     }
 
+    @Test
+    void unwrapOrElse() {
+        Function<String, Integer> count = String::length;
+
+        Result<Integer, String> x = Ok.of(2);
+        Assertions.assertEquals(2, x.unwrapOrElse(count));
+        Result<Integer, String> y = Err.of("foo");
+        Assertions.assertEquals(3, y.unwrapOrElse(count));
+    }
+
 }
