@@ -103,7 +103,7 @@ public abstract class Result<T, E> {
             return false;
         }
 
-        return Objects.equals(ok().get(), value);
+        return Objects.equals(ok, value);
     }
 
     /**
@@ -120,8 +120,7 @@ public abstract class Result<T, E> {
             return false;
         }
 
-        //noinspection OptionalGetWithoutIsPresent
-        return Objects.equals(value, err().get());
+        return Objects.equals(value, err);
     }
 
     /**
@@ -156,24 +155,6 @@ public abstract class Result<T, E> {
         return this.err().equals(obj2CompareResult.err());
     }
 
-    @Override
-    @NotNull
-    public String toString() {
-        if (this.isOk()) {
-            T content = ok().orElse(null);
-            if (content instanceof String) {
-                return String.format(TO_STRING_QUOTE_FMT, OK, content);
-            }
-            return String.format(TO_STRING_FMT, OK, content);
-        }
-
-        E content = err().orElse(null);
-        if (content instanceof String) {
-            return String.format(TO_STRING_QUOTE_FMT, ERR, content);
-        }
-        return String.format(TO_STRING_FMT, ERR, content);
-    }
-
     /**
      * @param msg passed message
      * @return the contained Ok value
@@ -182,7 +163,7 @@ public abstract class Result<T, E> {
     @Nullable
     public T expect(@NotNull String msg) throws ResultPanicException {
         if (okFlg) {
-            return ok().orElse(null);
+            return ok;
         }
 
         String errString = err().isEmpty() ? EMPTY_STRING : err().get().toString();
@@ -198,8 +179,7 @@ public abstract class Result<T, E> {
     @NotNull
     public E expectErr(@NotNull String msg) throws ResultPanicException {
         if (!okFlg) {
-            //noinspection OptionalGetWithoutIsPresent
-            return err().get();
+            return err;
         }
 
         String errString = ok().isEmpty() ? EMPTY_STRING : ok().get().toString();
@@ -218,17 +198,30 @@ public abstract class Result<T, E> {
             return Err.of(err);
         }
 
-        Optional<T> okOptional = ok();
-        if (okOptional.isEmpty()) {
+        if (ok().isEmpty()) {
             return this;
         }
 
-        T ok = okOptional.get();
         if (ok instanceof Result) {
             //noinspection unchecked,rawtypes
             return (Result) ok;
         }
         return this;
+    }
+
+    /**
+     * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained [`Err`] value
+     *
+     * @param mapFunction mapFunction
+     * @return Result<T, F>
+     */
+    @NotNull
+    public <F> Result<T, F> mapErr(@NotNull Function<E, F> mapFunction) {
+        if (this.isOk()) {
+            return Ok.of(this.ok);
+        }
+
+        return Err.of(mapFunction.apply(err));
     }
 
     /**
@@ -253,22 +246,6 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained [`Err`] value
-     *
-     * @param mapFunction mapFunction
-     * @return Result<T, F>
-     */
-    @NotNull
-    public <F> Result<T, F> mapErr(@NotNull Function<E, F> mapFunction) {
-        if (this.isOk()) {
-            return Ok.of(this.ok);
-        }
-
-        //noinspection OptionalGetWithoutIsPresent
-        return Err.of(mapFunction.apply(this.err().get()));
-    }
-
-    /**
      * Returns the provided default (if Err), or applies a function to the contained value (if Ok)
      *
      * @param defaultValue default value
@@ -285,7 +262,7 @@ public abstract class Result<T, E> {
             throw new ResultPanicException(CANT_APPLY_FUNCTION_A_EMPTY_OK);
         }
 
-        return mapFunction.apply(this.ok().get());
+        return mapFunction.apply(ok);
     }
 
     /**
@@ -298,15 +275,30 @@ public abstract class Result<T, E> {
     @NotNull
     public <U> U mapOrElse(@NotNull Function<E, U> defaultFunction, @NotNull Function<T, U> mapFunction) {
         if (this.isErr()) {
-            //noinspection OptionalGetWithoutIsPresent
-            return defaultFunction.apply(this.err().get());
+            return defaultFunction.apply(err);
         }
 
         if (this.ok().isEmpty()) {
             throw new ResultPanicException(CANT_APPLY_FUNCTION_A_EMPTY_OK);
         }
 
-        return mapFunction.apply(this.ok().get());
+        return mapFunction.apply(ok);
+    }
+
+    @Override
+    @NotNull
+    public String toString() {
+        if (this.isOk()) {
+            if (ok instanceof String) {
+                return String.format(TO_STRING_QUOTE_FMT, OK, ok);
+            }
+            return String.format(TO_STRING_FMT, OK, ok);
+        }
+
+        if (err instanceof String) {
+            return String.format(TO_STRING_QUOTE_FMT, ERR, err);
+        }
+        return String.format(TO_STRING_FMT, ERR, err);
     }
 
     /**
@@ -343,10 +335,9 @@ public abstract class Result<T, E> {
     @Nullable
     public T unwrap() throws ResultPanicException {
         if (okFlg) {
-            return ok().orElse(null);
+            return ok;
         }
 
-        //noinspection OptionalGetWithoutIsPresent
-        throw new ResultPanicException(err().get().toString());
+        throw new ResultPanicException(err.toString());
     }
 }
