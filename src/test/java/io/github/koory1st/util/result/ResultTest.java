@@ -9,21 +9,13 @@ class ResultTest {
 
     @Test
     void and() {
-        Result<Integer, String> x1 = Ok.of(2);
-        Result<String, String> y1 = Err.of("late error");
-        Assertions.assertEquals(y1, x1.and(y1));
+        Assertions.assertEquals(Err.of("late error"), Ok.of(2).and(Err.of("late error")));
 
-        Result<Integer, String> x2 = Err.of("early error");
-        Result<String, String> y2 = Ok.of("foo");
-        Assertions.assertEquals(x2, x2.and(y2));
+        Assertions.assertEquals(Err.of("early error"), Err.of("early error").and(Ok.of("foo")));
 
-        Result<Integer, String> x3 = Err.of("not a 2");
-        Result<String, String> y3 = Err.of("late error");
-        Assertions.assertEquals(x3, x3.and(y3));
+        Assertions.assertEquals(Err.of("not a 2"), Err.of("not a 2").and(Err.of("late error")));
 
-        Result<Integer, String> x4 = Ok.of(2);
-        Result<String, String> y4 = Ok.of("different result type");
-        Assertions.assertEquals(y4, x4.and(y4));
+        Assertions.assertEquals(Ok.of("different result type"), Ok.of(2).and(Ok.of("different result type")));
     }
 
     @Test
@@ -255,6 +247,17 @@ class ResultTest {
 
         var z = Ok.of();
         Assertions.assertTrue(z.isOk());
+    }
+
+    @Test
+    void or() {
+        Assertions.assertEquals(Ok.of(2), Ok.of(2).or(Err.of("late error")));
+
+        Assertions.assertEquals(Ok.of(2), Err.of("early error").or(Ok.of(2)));
+
+        Assertions.assertEquals(Err.of("late error"), Err.of("not a 2").or(Err.of("late error")));
+
+        Assertions.assertEquals(Ok.of(100), Ok.of(2).and(Ok.of(100)));
     }
 
     @Test

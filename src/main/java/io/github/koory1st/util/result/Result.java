@@ -314,6 +314,21 @@ public abstract class Result<T, E> {
     }
 
     /**
+     * Returns `res` if the result is [`Err`], otherwise returns the [`Ok`] value of `self`.
+     *
+     * @param res res
+     * @return Result<T, F>
+     */
+    @NotNull
+    public <F> Result<?, F> or(@NotNull Result<?, F> res) {
+        if (this.isOk()) {
+            return Ok.of(this.ok);
+        }
+
+        return res;
+    }
+
+    /**
      * @return the contained Ok value, consuming the self value.
      * @throws ResultPanicException if the value is an Err, with a message provided by the Err’s value.
      */
