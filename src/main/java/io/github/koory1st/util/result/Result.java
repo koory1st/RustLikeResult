@@ -38,12 +38,12 @@ public abstract class Result<T, E> {
      * @return Result
      */
     @NotNull
-    public <U> Result<?, E> and(@NotNull Result<U, E> res) {
+    public <U> Result<U, ?> and(@NotNull Result<U, ?> res) {
         if (this.isOk()) {
             return res;
         }
 
-        return this;
+        return Err.of(this.err);
     }
 
     /**
