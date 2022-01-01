@@ -261,6 +261,24 @@ class ResultTest {
     }
 
     @Test
+    void orElse() {
+        Function<Integer, Result<Integer, Integer>> sq = x -> Ok.of(x * x);
+        Function<Integer, Result<Integer, Integer>> err = Err::of;
+
+        Result<Integer, Integer> w = Ok.of(2);
+        Assertions.assertEquals(Ok.of(2), w.orElse(sq).orElse(sq));
+
+        Result<Integer, Integer> x = Ok.of(2);
+        Assertions.assertEquals(Ok.of(2), x.orElse(err).orElse(sq));
+
+        Result<Integer, Integer> y = Err.of(3);
+        Assertions.assertEquals(Ok.of(9), y.orElse(sq).orElse(err));
+
+        Result<Integer, Integer> z = Err.of(3);
+        Assertions.assertEquals(Err.of(3), z.orElse(err).orElse(err));
+    }
+
+    @Test
     void testEquals() {
         Assertions.assertEquals(Ok.of(1), Ok.of(1));
         Assertions.assertEquals(Ok.of(), Ok.of());

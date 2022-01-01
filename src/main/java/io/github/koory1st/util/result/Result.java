@@ -61,9 +61,8 @@ public abstract class Result<T, E> {
      */
     @NotNull
     public <U> Result<U, E> andThen(@NotNull Function<T, Result<U, E>> op) {
-        if (!this.isOk()) {
-            //noinspection OptionalGetWithoutIsPresent
-            return Err.of(this.err().get());
+        if (this.isErr()) {
+            return Err.of(this.err);
         }
 
         if (this.ok().isEmpty()) {
@@ -74,16 +73,10 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Converts from Result<T, E> to Option<E>.
-     *
-     * @return Optional<E>
+     * @return true if the result is Err.
      */
-    @NotNull
-    public Optional<E> err() {
-        if (isErr()) {
-            return Optional.of(err);
-        }
-        return Optional.ofNullable(err);
+    public boolean isErr() {
+        return !okFlg;
     }
 
     /**
@@ -94,13 +87,6 @@ public abstract class Result<T, E> {
     @NotNull
     public Optional<T> ok() {
         return Optional.ofNullable(ok);
-    }
-
-    /**
-     * @return true if the result is Err.
-     */
-    public boolean isErr() {
-        return !okFlg;
     }
 
     /**
@@ -136,6 +122,19 @@ public abstract class Result<T, E> {
 
         //noinspection OptionalGetWithoutIsPresent
         return Objects.equals(value, err().get());
+    }
+
+    /**
+     * Converts from Result<T, E> to Option<E>.
+     *
+     * @return Optional<E>
+     */
+    @NotNull
+    public Optional<E> err() {
+        if (isErr()) {
+            return Optional.of(err);
+        }
+        return Optional.ofNullable(err);
     }
 
     @Override
@@ -249,7 +248,7 @@ public abstract class Result<T, E> {
         if (this.ok().isEmpty()) {
             throw new ResultPanicException(CANT_APPLY_FUNCTION_A_EMPTY_OK);
         }
-        
+
         return Ok.of(mapFunction.apply(this.ok));
     }
 
@@ -323,6 +322,18 @@ public abstract class Result<T, E> {
         }
 
         return res;
+    }
+
+    /**
+     * Calls `op` if the result is [`Err`], otherwise returns the [`Ok`] value of `self`.
+     */
+    @NotNull
+    public <F> Result<T, F> orElse(@NotNull Function<E, Result<T, F>> op) {
+        if (this.isOk()) {
+            return Ok.of(ok);
+        }
+
+        return op.apply(err);
     }
 
     /**
