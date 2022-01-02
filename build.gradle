@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'io.github.koory1st'
-version '1.0.5'
+version '1.0.7'
 
 repositories {
     mavenCentral()
@@ -38,6 +38,7 @@ publishing {
     publications {
         publishProject(MavenPublication) {
             from(components.java)
+            artifactId 'rust-like-result'
             artifact sourceJar {
                 classifier "sources"
             }
