@@ -34,10 +34,9 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Returns `res` if the result is [`Ok`], otherwise returns the [`Err`] value of `self`.
-     *
      * @param res res
-     * @return Result
+     * @param <U> U
+     * @return `res` if the result is [`Ok`], otherwise returns the [`Err`] value of `self`.
      */
     @NotNull
     public <U> Result<U, ?> and(@NotNull Result<U, ?> res) {
@@ -58,8 +57,9 @@ public abstract class Result<T, E> {
     /**
      * Calls `op` if the result is [`Ok`], otherwise returns the [`Err`] value of `self`.
      *
-     * @param op op
-     * @return the [`Err`] value of `self`.
+     * @param op  op
+     * @param <U> U
+     * @return return
      */
     @NotNull
     public <U> Result<U, E> andThen(@NotNull Function<T, Result<U, E>> op) {
@@ -82,9 +82,9 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Converts from Result<T, E> to Optional<T>.
+     * Converts from Result&lt;T, E&gt; to Optional&lt;T&gt;.
      *
-     * @return Option<T>
+     * @return Option&lt;T&gt;
      */
     @NotNull
     public Optional<T> ok() {
@@ -145,9 +145,9 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Converts from Result<T, E> to Option<E>.
+     * Converts from Result&lt;T, E&gt; to Option&lt;E&gt;.
      *
-     * @return Optional<E>
+     * @return Optional&lt;E&gt;
      */
     @NotNull
     public Optional<E> err() {
@@ -206,9 +206,9 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Converts from Result<Result<T, E>, E> to Result<T, E>
+     * Converts from Result&lt;Result&lt;T, E&gt;, E&gt; to Result&lt;T, E&gt;
      *
-     * @return Result<T, E>
+     * @return Result&lt;T, E&gt;
      */
     @NotNull
     public Result<T, E> flatten() {
@@ -228,12 +228,13 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Maps a Result<T, E> to Result<U, E>
+     * Maps a Result&lt;T, E&gt; to Result&lt;U, E&gt;
      * by applying a function to a contained Ok value, leaving an Err value untouched.
      * This function can be used to compose the results of two functions.
      *
      * @param mapFunction mapFunction
-     * @return mapped Result<U, E>
+     * @param <U>         U
+     * @return mapped Result&lt;U, E&gt;
      */
     @NotNull
     public <U> Result<U, E> map(Function<T, U> mapFunction) {
@@ -249,10 +250,11 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained [`Err`] value
+     * Maps a `Result&lt;T, E&gt;` to `Result&lt;T, F&gt;` by applying a function to a contained [`Err`] value
      *
      * @param mapFunction mapFunction
-     * @return Result<T, F>
+     * @param <F>         F
+     * @return Result&lt;T, F&gt;
      */
     @NotNull
     public <F> Result<T, F> mapErr(@NotNull Function<E, F> mapFunction) {
@@ -268,6 +270,7 @@ public abstract class Result<T, E> {
      *
      * @param defaultValue default value
      * @param mapFunction  mapFunction
+     * @param <U>          U
      * @return mapped U
      */
     @NotNull
@@ -288,6 +291,7 @@ public abstract class Result<T, E> {
      *
      * @param defaultFunction defaultFunction
      * @param mapFunction     mapFunction
+     * @param <U>             U
      * @return mapped U
      */
     @NotNull
@@ -304,10 +308,9 @@ public abstract class Result<T, E> {
     }
 
     /**
-     * Returns `res` if the result is [`Err`], otherwise returns the [`Ok`] value of `self`.
-     *
      * @param res res
-     * @return Result<T, F>
+     * @param <F> F
+     * @return `res` if the result is [`Err`], otherwise returns the [`Ok`] value of `self`.
      */
     @NotNull
     public <F> Result<?, F> or(@NotNull Result<?, F> res) {
@@ -320,6 +323,10 @@ public abstract class Result<T, E> {
 
     /**
      * Calls `op` if the result is [`Err`], otherwise returns the [`Ok`] value of `self`.
+     *
+     * @param op  op
+     * @param <F> F
+     * @return result
      */
     @NotNull
     public <F> Result<T, F> orElse(@NotNull Function<E, Result<T, F>> op) {
@@ -332,7 +339,7 @@ public abstract class Result<T, E> {
 
     /**
      * @return the contained Ok value, consuming the self value.
-     * @throws ResultPanicException if the value is an Err, with a message provided by the Err’s value.
+     * @throws ResultPanicException if the value is an Err, with a message provided by the Errs value.
      */
     @Nullable
     public T unwrap() throws ResultPanicException {
