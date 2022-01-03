@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'io.github.koory1st'
-version '1.0.7'
+version '1.0.8'
 
 repositories {
     mavenCentral()
@@ -32,6 +32,14 @@ publishing {
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+        maven {
+            name = "OSSRH"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
     }
