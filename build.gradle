@@ -1,10 +1,13 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'signing'
 }
 
 group 'io.github.koory1st'
-version '1.0.8'
+version '1.0.9'
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
 
 repositories {
     mavenCentral()
@@ -14,6 +17,10 @@ dependencies {
     implementation 'org.jetbrains:annotations:22.0.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
 }
 
 task sourceJar(type: Jar) {
@@ -27,29 +34,31 @@ test {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/koory1st/RustLikeResult"
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-        maven {
             name = "OSSRH"
             url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
+                username = System.getenv("OSSRH_USERNAME")
+                password = System.getenv("OSSRH_PASSWORD")
             }
         }
     }
     publications {
-        publishProject(MavenPublication) {
+        mavenJava(MavenPublication) {
             from(components.java)
             artifactId 'rust-like-result'
-            artifact sourceJar {
-                classifier "sources"
+            artifact sourceJar
+            artifact javadocJar
+            pom {
+                description = "Rust like result"
+                scm {
+                    connection = "scm:git:git@github.com:koory1st/RustLikeResult.git"
+                    developerConnection = "scm:git:git@github.com:koory1st/RustLikeResult.git"
+                    url = "https://github.com/koory1st/RustLikeResult"
+                }
             }
         }
     }
+}
+signing {
+    sign publishing.publications.mavenJava
 }
