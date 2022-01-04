@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'io.github.koory1st'
-version '1.0.9'
+version '1.0.11'
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
 
@@ -41,7 +41,11 @@ publishing {
     repositories {
         maven {
             name = "OSSRH"
-            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            if (project.version.toString().endsWith("-SNAPSHOT")) {
+                url = "https://s01.oss.sonatype.org/content/repositories/snapshots"
+            } else {
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            }
             credentials {
                 username findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
                 password findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
@@ -56,6 +60,19 @@ publishing {
             artifact javadocJar
             pom {
                 description = "Rust like result"
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://github.com/koory1st/RustLikeResult/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'koory1st'
+                        name = 'koory1st'
+                        email = 'liguenator@gmail.com'
+                    }
+                }
                 scm {
                     connection = "scm:git:git@github.com:koory1st/RustLikeResult.git"
                     developerConnection = "scm:git:git@github.com:koory1st/RustLikeResult.git"
