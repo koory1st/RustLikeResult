@@ -156,11 +156,8 @@ public abstract class Result<T, E> {
      * @return Optional&lt;E&gt;
      */
     @NotNull
-    public Optional<E> err() {
-        if (isErr()) {
-            return Optional.of(err);
-        }
-        return Optional.ofNullable(err);
+    public E err() {
+        return err;
     }
 
     @Override
@@ -190,7 +187,7 @@ public abstract class Result<T, E> {
             return ok;
         }
 
-        String errString = err().isEmpty() ? EMPTY_STRING : err().get().toString();
+        String errString = err().toString();
 
         throw new ResultPanicException(String.format(EXPECT_FMT, msg, errString));
     }
