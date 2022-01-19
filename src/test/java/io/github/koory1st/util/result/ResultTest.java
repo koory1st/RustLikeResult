@@ -81,10 +81,10 @@ class ResultTest {
     @Test
     void err() {
         var x = Ok.of(2);
-        Assertions.assertTrue(x.err().isEmpty());
+        Assertions.assertNull(x.err());
 
         var y = Err.of("Nothing here");
-        Assertions.assertEquals("Nothing here", y.err().orElseThrow());
+        Assertions.assertEquals("Nothing here", y.err());
     }
 
     @Test
